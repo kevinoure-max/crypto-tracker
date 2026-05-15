@@ -31,9 +31,9 @@ def summarize_prices(prices, coin, days):
     print(f"\n=== {coin.capitalize()} - {days} days summary ===\n")
     print(
         f"{'Current price':<15}: {current_price:>8.2f} USD\n"
-        f"{'7-day high':<15}: {max_price:>8.2f} USD\n"
-        f"{'7-day low':<15}: {min_price:>8.2f} USD\n"
-        f"{'7-day change':<15}: {price_variation:>8.2f} %\n"
+        f"{str(days) + '-day high':<15}: {max_price:>8.2f} USD\n"
+        f"{str(days) + '-day low':<15}: {min_price:>8.2f} USD\n"
+        f"{str(days) + '-day change':<15}: {price_variation:>8.2f} %\n"
         f"{'Average price':<15}: {price_average:>8.2f} USD\n"
     )
 
