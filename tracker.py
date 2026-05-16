@@ -1,7 +1,7 @@
 import requests
 import argparse
 from datetime import datetime
-from database import init_db, save_snapshot
+from database import init_db, save_snapshot, get_snapshots
 
 
 def get_history(coin, days):
@@ -49,34 +49,69 @@ def display_summary(summary, coin, days):
     )
 
 
+def display_history(rows):
+    print(f"\n=== Snapshot history ===\n")
+
+    for (
+        id,
+        coin,
+        days,
+        current_price,
+        high,
+        low,
+        change_pct,
+        avg_price,
+        created_at,
+    ) in rows:
+        print(
+            f"[{id}] {coin.capitalize()} (days {days})\n"
+            f"{'Current price':<15}: {current_price:>8.2f} USD\n"
+            f"{'High':<15}: {high:>8.2f} USD\n"
+            f"{'Low':<15}: {low:>8.2f} USD\n"
+            f"{'Change (%)':<15}: {change_pct:>8.2f} %\n"
+            f"{'Average price':<15}: {avg_price:>8.2f} USD\n"
+            f"{'Created_at':<15}: {created_at:>8}\n"
+        )
+
+
 def script_parser():
     parser = argparse.ArgumentParser(description="Analyze a coin performance")
-    parser.add_argument("--coin", type=str, required=True, help="Filter by coin type")
-    parser.add_argument("--days", type=int, required=True, help="Period perimeter")
+    parser.add_argument("--coin", type=str, required=False, help="Filter by coin type")
+    parser.add_argument("--days", type=int, required=False, help="Period perimeter")
     parser.add_argument("--save", action="store_true", help="Save snapshot to database")
+    parser.add_argument("--history", action="store_true", help="Show snapshot history")
     args = parser.parse_args()
-    return (args.coin, args.days, args.save)
+    return (args.coin, args.days, args.save, args.history)
 
 
 def main():
     init_db()
-    coin_type, days, save = script_parser()
+    coin, days, save, history = script_parser()
+
+    if history:
+        rows = get_snapshots()
+        display_history(rows)
+        return
+
+    if not coin or not days:
+        print(f"Error : --coin and --days are required unless using --history")
+        return
 
     if days <= 0:
         print(f"Error : {days} is not valid. --days must be greater than 0.")
         return
 
-    prices = get_history(coin_type, days)
+    prices = get_history(coin, days)
 
     if prices is None:
         return
 
     summary = compute_summary(prices)
-    display_summary(summary, coin_type, days)
+    display_summary(summary, coin, days)
 
     if save:
         save_snapshot(
-            coin_type,
+            coin,
             days,
             summary["current_price"],
             summary["high"],
