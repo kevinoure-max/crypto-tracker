@@ -1,10 +1,13 @@
-import sqlite3
+import psycopg2
+import os
+from dotenv import load_dotenv
 
-DB_PATH = "tracker.db"
+load_dotenv()
 
 
 def get_connection():
-    return sqlite3.connect(DB_PATH)
+    url = os.getenv("DATABASE_URL")
+    return psycopg2.connect(url)
 
 
 def init_db():
@@ -12,7 +15,7 @@ def init_db():
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS snapshots (
-            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            id            SERIAL PRIMARY KEY,
             coin          TEXT NOT NULL,
             days          INTEGER NOT NULL,
             current_price REAL NOT NULL,
@@ -33,7 +36,7 @@ def save_snapshot(coin, days, current_price, high, low, change_pct, avg_price):
     cursor.execute(
         """
         INSERT INTO snapshots (coin, days, current_price, high, low, change_pct, avg_price)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
     """,
         (coin, days, current_price, high, low, change_pct, avg_price),
     )
