@@ -1,6 +1,7 @@
 import requests
-from datetime import datetime
 import argparse
+from datetime import datetime
+from database import init_db, save_snapshot
 
 
 def get_history(coin, days):
@@ -20,7 +21,7 @@ def get_history(coin, days):
     return data["prices"]
 
 
-def summarize_prices(prices, coin, days):
+def compute_summary(prices):
     only_prices = [price for timestamp, price in prices]
     current_price = only_prices[-1]
     max_price = max(only_prices)
@@ -28,13 +29,23 @@ def summarize_prices(prices, coin, days):
     first_price = only_prices[0]
     price_variation = ((current_price - first_price) / first_price) * 100
     price_average = sum(only_prices) / len(only_prices)
+    return {
+        "current_price": current_price,
+        "high": max_price,
+        "low": min_price,
+        "change_pct": price_variation,
+        "avg_price": price_average,
+    }
+
+
+def display_summary(summary, coin, days):
     print(f"\n=== {coin.capitalize()} - {days} days summary ===\n")
     print(
-        f"{'Current price':<15}: {current_price:>8.2f} USD\n"
-        f"{str(days) + '-day high':<15}: {max_price:>8.2f} USD\n"
-        f"{str(days) + '-day low':<15}: {min_price:>8.2f} USD\n"
-        f"{str(days) + '-day change':<15}: {price_variation:>8.2f} %\n"
-        f"{'Average price':<15}: {price_average:>8.2f} USD\n"
+        f"{'Current price':<15}: {summary['current_price']:>8.2f} USD\n"
+        f"{str(days) + '-day high':<15}: {summary['high']:>8.2f} USD\n"
+        f"{str(days) + '-day low':<15}: {summary['low']:>8.2f} USD\n"
+        f"{str(days) + '-day change':<15}: {summary['change_pct']:>8.2f} %\n"
+        f"{'Average price':<15}: {summary['avg_price']:>8.2f} USD\n"
     )
 
 
@@ -42,12 +53,14 @@ def script_parser():
     parser = argparse.ArgumentParser(description="Analyze a coin performance")
     parser.add_argument("--coin", type=str, required=True, help="Filter by coin type")
     parser.add_argument("--days", type=int, required=True, help="Period perimeter")
+    parser.add_argument("--save", action="store_true", help="Save snapshot to database")
     args = parser.parse_args()
-    return (args.coin, args.days)
+    return (args.coin, args.days, args.save)
 
 
 def main():
-    coin_type, days = script_parser()
+    init_db()
+    coin_type, days, save = script_parser()
 
     if days <= 0:
         print(f"Error : {days} is not valid. --days must be greater than 0.")
@@ -58,7 +71,19 @@ def main():
     if prices is None:
         return
 
-    summarize_prices(prices, coin_type, days)
+    summary = compute_summary(prices)
+    display_summary(summary, coin_type, days)
+
+    if save:
+        save_snapshot(
+            coin_type,
+            days,
+            summary["current_price"],
+            summary["high"],
+            summary["low"],
+            summary["change_pct"],
+            summary["avg_price"],
+        )
 
 
 if __name__ == "__main__":
