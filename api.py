@@ -1,13 +1,16 @@
 from fastapi import FastAPI, HTTPException
 from database import init_db, get_snapshots
 from tracker import get_history, compute_summary
+from contextlib import asynccontextmanager
 
-app = FastAPI()
 
-
-@app.on_event("startup")
-def startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     init_db()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/coins/{coin}")
