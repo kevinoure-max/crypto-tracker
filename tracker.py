@@ -30,11 +30,11 @@ def compute_summary(prices):
     price_variation = ((current_price - first_price) / first_price) * 100
     price_average = sum(only_prices) / len(only_prices)
     return {
-        "current_price": current_price,
-        "high": max_price,
-        "low": min_price,
-        "change_pct": price_variation,
-        "avg_price": price_average,
+        "current_price": round(current_price, 2),
+        "high": round(max_price, 2),
+        "low": round(min_price, 2),
+        "change_pct": round(price_variation, 2),
+        "avg_price": round(price_average, 2),
     }
 
 
