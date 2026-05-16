@@ -1,8 +1,13 @@
+# Database
 tracker.db
 
+# Virtual env
 .venv/
 
+# Python
 __pycache__/
 *.pyc
 
+# Environment variables
 .env
+.env*
