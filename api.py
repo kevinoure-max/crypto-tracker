@@ -43,11 +43,11 @@ def get_history_endpoint():
                 "id": id,
                 "coin": coin,
                 "days": days,
-                "current_price": current_price,
-                "high": high,
-                "low": low,
-                "change_pct": change_pct,
-                "avg_price": avg_price,
+                "current_price": round(current_price, 2),
+                "high": round(high, 2),
+                "low": round(low, 2),
+                "change_pct": round(change_pct, 2),
+                "avg_price": round(avg_price, 2),
                 "created_at": created_at,
             }
         )
