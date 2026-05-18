@@ -1,8 +1,15 @@
 # Crypto Tracker
 
-A command-line Python tool that fetches and analyzes cryptocurrency market data from the CoinGecko API and displays a summary of price activity over a selected number of days.
+A Python application for cryptocurrency market tracking and analytics using the CoinGecko API.
 
-It also allows saving snapshots locally and viewing historical analyses using SQLite. 
+The project provides:
+- a CLI interface for data analysis
+- a REST API built with FastAPI
+- PostgreSQL persistence for historical snapshots
+
+## Tech Stack
+
+Python • FastAPI • PostgreSQL • pytest • Railway • Git
 
 ## Features
 
@@ -12,32 +19,57 @@ It also allows saving snapshots locally and viewing historical analyses using SQ
   - High / Low
   - Average price
   - Price variation (%)
-- Save snapshots to a local SQLite database
+- Save historical snapshots into PostgreSQL
 - View saved historical snapshots
-- Filter results using command-line arguments
-- Handle common errors (invalid coin, invalid days, network/API issues)
+- REST API with FastAPI
+- Automated API tests with pytest
+- Error handling for invalid inputs and API failures
+- Railway deployment support
 
-## Requirements
+## Project Architecture 
 
-- Python 3.8+
-- requests
-SQLite is included with Python (no installation required)
+```text
+.
+├── api.py            # FastAPI REST API
+├── tracker.py        # CLI logic and data analysis
+├── database.py       # PostgreSQL connection and persistence
+├── test.py           # API tests
+├── requirements.txt  # Dependencies
+├── Procfile          # Railway deployment configuration
+└── .env              # Environment variables
+```
 
 ## Installation
 
-Clone the repository and install dependencies:
+Clone the repository:
 ```bash
-pip install requests
+git clone <repository_url>
+cd crypto-tracker
 ```
 
-Run the project
+Create and activate a virtual environment (optional):
+
 ```bash
-python tracker.py 
+python -m venv .venv
 ```
 
-## Usage
+Install dependencies:
 
-### Basic command
+```bash
+pip install -r requirements.txt
+```
+
+## Environment Variables
+
+Create a '.env' file:
+
+```env
+DATABASE_URL=your_postgresql_connection_url
+```
+
+## CLI Usage
+
+### Analyze cryptocurrency
 
 ```bash
 python tracker.py --coin bitcoin --days 7
@@ -45,44 +77,98 @@ python tracker.py --coin bitcoin --days 7
 
 ### Save a snapshot
 
-Use the --save flag to store the analysis in a local SQLite database:
 ```bash
 python tracker.py --coin bitcoin --days 7 --save 
 ```
 Data is saved in tracker.db
 
-### View history
+### View snapshot history
 
-Display all saved snapshots
 ```bash
 python tracker.py --history
 ```
 Note: this option ignores --coin and --days
 
-## Example Output
+## API Usage
 
-```text
-=== Bitcoin - 7 days summary ===
+Start the API locally:
 
-Current price  : 81300.16 USD
-7-day high     : 82145.66 USD
-7-day low      : 78827.55 USD
-7-day change   :     0.69 %
-Average price  : 80736.18 USD
+```bash
+uvicorn api:app --reload
 ```
 
-## Error handling 
-
-Examples of handled errors:
+API available at:
 
 ```text
-Error: network request failed - ...
-Error: coin 'xxx' not found. Check the name (e.g. 'bitcoin')
-Error: 0 is not valid. --days must be greater than 0.
-Error: --coin and --days are required unless using --history
+http://127.0.0.1:8000
 ```
 
-## Notes
+### Get coin analytics
+
+Open in your browser:
+
+```text
+http://127.0.0.1:8000/coins/bitcoin?days=7
+```
+
+Example response:
+
+```json
+{
+  "current_price": 81300.16,
+  "high": 82145.66,
+  "low": 78827.55,
+  "change_pct": 0.69,
+  "avg_price": 80736.18,
+  "coin": "bitcoin",
+  "days": 7
+}
+```
+
+### Get snapshot history
+
+Open in your browser:
+
+```text
+http://127.0.0.1:8000/history
+```
+
+## Testing
+
+Run tests with pytest:
+
+```bash
+pytest
+```
+
+Current tests:
+- valid coin request
+- invalid coin handling
+- invalid day parameter handling
+
+## Deployment
+
+Deployment-ready configuration for Railway using:
+- FastAPI
+- Uvicorn
+- PostgreSQL
+
+Example Procfile:
+
+```text
+web: uvicorn api:app --host 0.0.0.0 --port $PORT
+```
+
+## Error Handling
+
+Handled scenarios include:
+- invalid coin IDs
+- invalid day parameters
+- network request failures
+- API response errors
+- FastAPI HTTP exceptions
+
+## Coin IDs Notes
 
 Coin names must use the official CoinGecko coin ID format.
 
@@ -93,31 +179,6 @@ Valid examples:
 - dogecoin
 
 Invalid examples:
-- Bitcoin
 - BTC
+- Bitcoin
 - Eth
-
-## Database
-
-The project uses a local SQLite database (tracker.db) with the table:
-```text
-snapshots(
-    id,
-    coin,
-    days,
-    current_price,
-    high,
-    low,
-    change_pct,
-    avg_price,
-    created_at
-)
-```
-
-## Summary
-
-This tool combines:
-- API data fetching
-- CLI interaction
-- data analysis
-- local persistence
