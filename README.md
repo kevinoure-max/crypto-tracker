@@ -11,6 +11,22 @@ The project provides:
 
 Python • FastAPI • PostgreSQL • pytest • Railway • Git
 
+## Live Demo
+
+API deployed on Railway:
+
+- API Base URL  
+  https://web-production-xxxx.up.railway.app
+
+- Swagger Documentation  
+  https://web-production-xxxx.up.railway.app/docs
+
+- Coin Analytics Example  
+  https://web-production-xxxx.up.railway.app/coins/bitcoin?days=7
+
+- Snapshot History  
+  https://web-production-xxxx.up.railway.app/history
+
 ## Features
 
 - Fetch real-time cryptocurrency market data from the CoinGecko API
@@ -36,7 +52,7 @@ Python • FastAPI • PostgreSQL • pytest • Railway • Git
 ├── test.py           # API tests
 ├── requirements.txt  # Dependencies
 ├── Procfile          # Railway deployment configuration
-└── .env              # Environment variables
+└── .env.exemple      # Environment variables template
 ```
 
 ## Installation
@@ -80,7 +96,7 @@ python tracker.py --coin bitcoin --days 7
 ```bash
 python tracker.py --coin bitcoin --days 7 --save 
 ```
-Data is saved in tracker.db
+Data is saved in PostgreSQL
 
 ### View snapshot history
 
