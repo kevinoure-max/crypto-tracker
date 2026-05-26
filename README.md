@@ -16,16 +16,16 @@ Python • FastAPI • PostgreSQL • pytest • Railway • Git
 API deployed on Railway:
 
 - API Base URL  
-  https://web-production-xxxx.up.railway.app
+  https://web-production-481dd.up.railway.app
 
 - Swagger Documentation  
-  https://web-production-xxxx.up.railway.app/docs
+  https://web-production-481dd.up.railway.app/docs
 
 - Coin Analytics Example  
-  https://web-production-xxxx.up.railway.app/coins/bitcoin?days=7
+  https://web-production-481dd.up.railway.app/coins/bitcoin?days=7
 
 - Snapshot History  
-  https://web-production-xxxx.up.railway.app/history
+  https://web-production-481dd.up.railway.app/history
 
 ## Features
 
@@ -52,7 +52,7 @@ API deployed on Railway:
 ├── test.py           # API tests
 ├── requirements.txt  # Dependencies
 ├── Procfile          # Railway deployment configuration
-└── .env.exemple      # Environment variables template
+└── .env.example      # Environment variables template
 ```
 
 ## Installation

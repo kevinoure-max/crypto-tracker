@@ -1,6 +1,5 @@
 import requests
 import argparse
-from datetime import datetime
 from database import init_db, save_snapshot, get_snapshots
 
 
